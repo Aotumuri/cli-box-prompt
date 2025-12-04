@@ -141,8 +141,24 @@ function render(state) {
   process.stdout.write(`${text}\n`);
 }
 
+function isInputValid(state) {
+  if (!state.validationRegex) return true;
+  if (state.validationRegex.global) state.validationRegex.lastIndex = 0;
+  return state.validationRegex.test(state.input);
+}
+
 function renderInput(state) {
-  const footerLines = state.showFooterHint ? [state.hintText] : [];
+  const footerLines = [];
+  const matchesPattern = isInputValid(state);
+  const shouldWarn = state.validationRegex && !matchesPattern;
+
+  if (shouldWarn) {
+    footerLines.push(chalk.red(state.invalidMessage));
+  }
+
+  if (state.showFooterHint) {
+    footerLines.push(state.hintText);
+  }
   const lines = [];
   String(state.question)
     .split('\n')
@@ -275,12 +291,31 @@ async function pickBox(options) {
 }
 
 function runInput(options) {
+  const rawPattern = options.pattern ?? options.validationPattern ?? null;
+  let validationRegex = null;
+
+  if (rawPattern !== null && rawPattern !== undefined) {
+    if (rawPattern instanceof RegExp) {
+      validationRegex = new RegExp(rawPattern.source, rawPattern.flags);
+    } else if (typeof rawPattern === 'string') {
+      try {
+        validationRegex = new RegExp(rawPattern);
+      } catch (err) {
+        throw new Error(`Invalid pattern: ${err.message}`);
+      }
+    } else {
+      throw new Error('pattern/validationPattern must be a RegExp or string.');
+    }
+  }
+
   const state = {
     question: options.question || '',
     borderStyle: options.borderStyle || 'round',
     boxWidth: options.boxWidth ?? null,
     showFooterHint: options.showFooterHint !== false,
     hintText: options.hintText || 'Type your answer and press Enter.',
+    validationRegex,
+    invalidMessage: options.invalidMessage || 'Input does not match required format.',
     input: '',
     cursor: '▌'
   };
@@ -295,6 +330,11 @@ function runInput(options) {
       }
 
       if (str === '\r' || str === '\n') {
+        const matchesPattern = isInputValid(state);
+        if (!matchesPattern) {
+          renderInput(state);
+          return;
+        }
         cleanup();
         renderInput(state);
         resolve({ value: state.input });

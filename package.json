@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "type": "commonjs",
   "bin": {
-    "cli-box-prompt": "bin/cli-box-prompt.js"
+    "cli-box-prompt": "bin/cli-box-prompt.js",
+    "cli-box-email": "bin/cli-box-email.js"
   },
   "engines": {
     "node": ">=18"
