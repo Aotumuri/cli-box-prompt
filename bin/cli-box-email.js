@@ -8,6 +8,7 @@ async function run() {
     question: "Enter your email:",
     borderStyle: "round",
     pattern: emailPattern,
+    placeholder: "user@example.com",
     invalidMessage: "Please enter a valid email address.",
   });
 

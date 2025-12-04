@@ -151,6 +151,8 @@ function renderInput(state) {
   const footerLines = [];
   const matchesPattern = isInputValid(state);
   const shouldWarn = state.validationRegex && !matchesPattern;
+  const inputDisplay =
+    state.input || (state.placeholder ? chalk.gray(state.placeholder) : '');
 
   if (shouldWarn) {
     footerLines.push(chalk.red(state.invalidMessage));
@@ -164,7 +166,7 @@ function renderInput(state) {
     .split('\n')
     .forEach((line) => lines.push(line));
   lines.push('');
-  lines.push(`> ${state.input}${state.cursor}`);
+  lines.push(`> ${inputDisplay}${state.cursor}`);
 
   if (footerLines.length) {
     lines.push('');
@@ -314,6 +316,7 @@ function runInput(options) {
     boxWidth: options.boxWidth ?? null,
     showFooterHint: options.showFooterHint !== false,
     hintText: options.hintText || 'Type your answer and press Enter.',
+    placeholder: options.placeholder || '',
     validationRegex,
     invalidMessage: options.invalidMessage || 'Input does not match required format.',
     input: '',

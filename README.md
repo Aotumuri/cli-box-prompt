@@ -96,6 +96,7 @@ Simple free-input prompt.
 | `boxWidth` | `number \| null` | `null` | Fixed inner content width (min 15). |
 | `showFooterHint` | `boolean` | `true` | Show the hint line “Type your answer and press Enter.” |
 | `hintText` | `string` | `'Type your answer and press Enter.'` | Custom footer hint. |
+| `placeholder` | `string` | `''` | Light gray placeholder shown before any input is typed. |
 | `pattern` | `RegExp \| string` | `null` | If provided, input must match this pattern (enter is ignored until it matches). Red warning shown while typing when it does not match. |
 | `invalidMessage` | `string` | `'Input does not match required format.'` | Message displayed in red when `pattern` is not matched. |
 
@@ -105,6 +106,7 @@ Example enforcing an email shape:
 const result = await inputBox({
   question: 'Enter your email:',
   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/,
+  placeholder: 'user@example.com',
   invalidMessage: 'Please enter a valid email address.'
 });
 ```
