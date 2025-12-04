@@ -151,8 +151,13 @@ function renderInput(state) {
   const footerLines = [];
   const matchesPattern = isInputValid(state);
   const shouldWarn = state.validationRegex && !matchesPattern;
-  const inputDisplay =
-    state.input || (state.placeholder ? chalk.gray(state.placeholder) : '');
+  const hasInput = state.input.length > 0;
+  const inputDisplay = hasInput
+    ? state.input
+    : state.placeholder
+    ? chalk.gray(state.placeholder)
+    : '';
+  const cursorDisplay = !hasInput && state.placeholder ? '' : state.cursor;
 
   if (shouldWarn) {
     footerLines.push(chalk.red(state.invalidMessage));
@@ -166,7 +171,7 @@ function renderInput(state) {
     .split('\n')
     .forEach((line) => lines.push(line));
   lines.push('');
-  lines.push(`> ${inputDisplay}${state.cursor}`);
+  lines.push(`> ${inputDisplay}${cursorDisplay}`);
 
   if (footerLines.length) {
     lines.push('');
