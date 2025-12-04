@@ -152,12 +152,13 @@ function renderInput(state) {
   const matchesPattern = isInputValid(state);
   const shouldWarn = state.validationRegex && !matchesPattern;
   const hasInput = state.input.length > 0;
+  const cursorChar = state.cursorVisible ? state.cursor : ' ';
   const inputDisplay = hasInput
     ? state.input
     : state.placeholder
     ? chalk.gray(state.placeholder)
     : '';
-  const cursorDisplay = !hasInput && state.placeholder ? '' : state.cursor;
+  const cursorDisplay = !hasInput && state.placeholder ? '' : cursorChar;
 
   if (shouldWarn) {
     footerLines.push(chalk.red(state.invalidMessage));
@@ -325,10 +326,18 @@ function runInput(options) {
     validationRegex,
     invalidMessage: options.invalidMessage || 'Input does not match required format.',
     input: '',
-    cursor: '▌'
+    cursor: '▌',
+    cursorVisible: true
   };
 
   return new Promise((resolve) => {
+    let active = true;
+    const blinkTimer = setInterval(() => {
+      if (!active) return;
+      state.cursorVisible = !state.cursorVisible;
+      renderInput(state);
+    }, 500);
+
     const onData = (buf) => {
       const str = buf.toString();
 
@@ -363,6 +372,8 @@ function runInput(options) {
     };
 
     const cleanup = () => {
+      active = false;
+      clearInterval(blinkTimer);
       process.stdin.setRawMode(false);
       process.stdin.off('data', onData);
       process.stdin.pause();
