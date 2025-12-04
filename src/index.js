@@ -332,11 +332,19 @@ function runInput(options) {
 
   return new Promise((resolve) => {
     let active = true;
-    const blinkTimer = setInterval(() => {
+    let blinkTimer = null;
+
+    const restartBlink = () => {
       if (!active) return;
-      state.cursorVisible = !state.cursorVisible;
+      if (blinkTimer) clearInterval(blinkTimer);
+      state.cursorVisible = true;
+      blinkTimer = setInterval(() => {
+        if (!active) return;
+        state.cursorVisible = !state.cursorVisible;
+        renderInput(state);
+      }, 500);
       renderInput(state);
-    }, 500);
+    };
 
     const onData = (buf) => {
       const str = buf.toString();
@@ -360,7 +368,7 @@ function runInput(options) {
 
       if (str === '\u0008' || str === '\u007f') {
         state.input = state.input.slice(0, -1);
-        renderInput(state);
+        restartBlink();
         return;
       }
 
@@ -368,12 +376,12 @@ function runInput(options) {
       if (str.startsWith('\u001b')) return;
 
       state.input += str;
-      renderInput(state);
+      restartBlink();
     };
 
     const cleanup = () => {
       active = false;
-      clearInterval(blinkTimer);
+      if (blinkTimer) clearInterval(blinkTimer);
       process.stdin.setRawMode(false);
       process.stdin.off('data', onData);
       process.stdin.pause();
@@ -382,7 +390,7 @@ function runInput(options) {
     process.stdin.setRawMode(true);
     process.stdin.resume();
     process.stdin.on('data', onData);
-    renderInput(state);
+    restartBlink();
   });
 }
 
