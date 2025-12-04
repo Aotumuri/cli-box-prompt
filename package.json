@@ -1,0 +1,19 @@
+{
+  "name": "cli-box-prompt",
+  "version": "0.1.0",
+  "description": "Small interactive picker for terminals. Renders a boxed question with selectable choices, supports hotkeys, inline/footer descriptions, and optional confirmation.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "bin": {
+    "cli-box-prompt": "bin/cli-box-prompt.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-box-renderer": "^0.1.1"
+  }
+}
